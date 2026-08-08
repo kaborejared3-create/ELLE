@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Une petite question...</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+        }
+
+        h2 {
+            color: #ff4757;
+            margin-bottom: 25px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            position: relative;
+            min-height: 50px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-yes {
+            background-color: #2ed573;
+            color: white;
+            box-shadow: 0 4px 15px rgba(46, 213, 115, 0.4);
+        }
+
+        .btn-yes:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-no {
+            background-color: #ff4757;
+            color: white;
+            position: relative;
+        }
+
+        /* Style pour le menu (Étape 3) */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            max-height: 250px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .success-message {
+            color: #2ed573;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <!-- ÉTAPE 1 : Veux-tu être ma copine ? -->
+        <div id="step-1" class="step">
+            <h2>Est-ce que tu veux être ma copine ? ❤️</h2>
+            <div class="buttons">
+                <button class="btn-yes" onclick="nextStep(2)">Oui</button>
+                <button class="btn-no" id="btn-no-1" onmouseover="moveButton('btn-no-1')" onclick="moveButton('btn-no-1')">Non</button>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 2 : Restaurant -->
+        <div id="step-2" class="step hidden">
+            <h2>Veux-tu aller manger dans un restaurant ? 🍽️</h2>
+            <div class="buttons">
+                <button class="btn-yes" onclick="nextStep(3)">Oui</button>
+                <button class="btn-no" id="btn-no-2" onmouseover="moveButton('btn-no-2')" onclick="moveButton('btn-no-2')">Non</button>
+            </div>
+        </div>
+
+        <!-- ÉTAPE 3 : Choix du menu (9+ éléments) -->
+        <div id="step-3" class="step hidden">
+            <h2>Choisis au moins 9 choses qui te font envie pour notre date 🍕</h2>
+            <div class="menu-grid" id="menu-container">
+                <!-- Généré par JavaScript -->
+            </div>
+            <p><span id="count">0</span>/9 sélectionnés</p>
+            <button class="btn-yes" id="btn-validate" onclick="finish()" disabled style="opacity: 0.5;">Valider mon choix</button>
+        </div>
+
+        <!-- ÉTAPE 4 : Validation finale -->
+        <div id="step-4" class="step hidden">
+            <h2>C'est noté ! 🎉</h2>
+            <p class="success-message">J'ai hâte qu'on aille faire tout ça ensemble mon ❤️ !</p>
+        </div>
+    </div>
+
+    <script>
+        // Fonction pour faire fuir le bouton "Non"
+        function moveButton(btnId) {
+            const btn = document.getElementById(btnId);
+            const x = Math.random() * 200 - 100; // Déplacement aléatoire X
+            const y = Math.random() * 100 - 50;  // Déplacement aléatoire Y
+            btn.style.transform = `translate(${x}px, ${y}px)`;
+        }
+
+        // Changer d'étape
+        function nextStep(stepNumber) {
+            document.querySelectorAll('.step').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`step-${stepNumber}`).classList.remove('hidden');
+
+            if (stepNumber === 3) {
+                loadMenu();
+            }
+        }
+
+        // Liste des 12 éléments du menu
+        const menuItemsList = [
+            "Pizza 4 fromages 🍕", "Tacos XXL 🌯", "Burger maison 🍔", 
+            "Sushi / Maki 🍣", "Tiramisu  Tiramisu ", "Glace vanille/chocolat 🍨", 
+            "Poulet braisé 🍗", "Pâtes carbonara 🍝", "Milkshake Nutella 🥤", 
+            "Churros 🍩", "Crêpe au sucre 🥞", "Jus de fruits frais 🍹"
+        ];
+
+        function loadMenu() {
+            const container = document.getElementById('menu-container');
+            container.innerHTML = '';
+            menuItemsList.forEach((item, index) => {
+                container.innerHTML += `
+                    <label class="menu-item">
+                        <input type="checkbox" value="${item}" onchange="updateCount()">
+                        ${item}
+                    </label>
+                `;
+            });
+        }
+
+        // Compter les éléments cochés (minimum 9)
+        function updateCount() {
+            const checkboxes = document.querySelectorAll('#menu-container input[type="checkbox"]:checked');
+            const count = checkboxes.length;
+            document.getElementById('count').innerText = count;
+
+            const validateBtn = document.getElementById('btn-validate');
+            if (count >= 9) {
+                validateBtn.disabled = false;
+                validateBtn.style.opacity = '1';
+            } else {
+                validateBtn.disabled = true;
+                validateBtn.style.opacity = '0.5';
+            }
+        }
+
+        function finish() {
+            nextStep(4);
+        }
+    </script>
+
+</body>
+</html>
